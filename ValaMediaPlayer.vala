@@ -98,7 +98,7 @@ public class MediaPlayer : Window {
 
 		var hbox = new HBox(false, 0);
 		hbox.pack_start(new Label("URI:"), false, true, 5);
-		hbox.pack_end(entry);
+		hbox.pack_end(entry, true, true, 0);
 
 		msg_dialog.vbox.pack_end(hbox, true, true, 0);
 		msg_dialog.show_all();
