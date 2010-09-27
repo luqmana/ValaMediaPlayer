@@ -1,6 +1,9 @@
 using Gst;
 using Gtk;
 
+/* Whether or not to output debug messages */
+public bool debug = false;
+
 public class MediaPlayer : Window {
 
     private string stream;
@@ -10,7 +13,6 @@ public class MediaPlayer : Window {
     public MediaPlayer() {
 
         this.set_title("Media Player");
-        //this.set_icon();
 
         this.destroy.connect(Gtk.main_quit);
 
@@ -273,9 +275,11 @@ public class StreamPlayer {
                 Gst.State pending;
                 message.parse_state_changed (out oldstate, out newstate,
                                              out pending);
-                //stdout.printf ("state changed: %s->%s:%s\n",
-                //               oldstate.to_string (), newstate.to_string (),
-                //               pending.to_string ());
+                if (debug) {
+                    stdout.printf ("state changed: %s->%s:%s\n",
+                                   oldstate.to_string (), newstate.to_string (),
+                                   pending.to_string ());
+                }
 
                 break;
 
