@@ -3,237 +3,237 @@ using Gtk;
 
 public class MediaPlayer : Window {
 
-	private string stream;
-	private DrawingArea drawing_area;
-	private StreamPlayer stream_player;
+    private string stream;
+    private DrawingArea drawing_area;
+    private StreamPlayer stream_player;
 
-	public MediaPlayer() {
+    public MediaPlayer() {
 
-		this.set_title("Media Player");
-		//this.set_icon();
+        this.set_title("Media Player");
+        //this.set_icon();
 
         this.destroy.connect(Gtk.main_quit);
 
-		// Create UI
-		create_ui();
+        // Create UI
+        create_ui();
 
-		this.stream_player = new StreamPlayer();
+        this.stream_player = new StreamPlayer();
 
-	}
+    }
 
-	private void create_ui() {
+    private void create_ui() {
 
-		var vbox = new VBox(false, 0);
+        var vbox = new VBox(false, 0);
 
-		MenuBar menu_bar = new MenuBar();
+        MenuBar menu_bar = new MenuBar();
 
-		Menu file_menu = new Menu();
-		
-		MenuItem open_item = new MenuItem();
-		open_item.set_label("Open");
-		open_item.activate.connect(on_open_clicked);
+        Menu file_menu = new Menu();
 
-		MenuItem open_loc_item = new MenuItem();
-		open_loc_item.set_label("Open Location");
-		open_loc_item.activate.connect(on_file_loc_activated);
+        MenuItem open_item = new MenuItem();
+        open_item.set_label("Open");
+        open_item.activate.connect(on_open_clicked);
 
-		MenuItem quit_item = new MenuItem();
-		quit_item.set_label("Quit");
-		quit_item.activate.connect(Gtk.main_quit);
+        MenuItem open_loc_item = new MenuItem();
+        open_loc_item.set_label("Open Location");
+        open_loc_item.activate.connect(on_file_loc_activated);
 
-		file_menu.append(open_item);
-		file_menu.append(open_loc_item);
-		file_menu.append(quit_item);
-	
-		MenuItem file_item = new MenuItem();
-		file_item.set_label("File");
-		file_item.set_submenu(file_menu);
+        MenuItem quit_item = new MenuItem();
+        quit_item.set_label("Quit");
+        quit_item.activate.connect(Gtk.main_quit);
 
-		menu_bar.append(file_item);
+        file_menu.append(open_item);
+        file_menu.append(open_loc_item);
+        file_menu.append(quit_item);
 
-		vbox.pack_start(menu_bar, false, true, 0);		
+        MenuItem file_item = new MenuItem();
+        file_item.set_label("File");
+        file_item.set_submenu(file_menu);
 
-		this.drawing_area = new DrawingArea();
-		this.drawing_area.set_size_request(400, 300);
-		
-		var black = Gdk.Color() {
-			red = 0,
-			green =  0,
-			blue = 0
-		};
+        menu_bar.append(file_item);
 
-		this.drawing_area.modify_bg(Gtk.StateType.NORMAL, black);
+        vbox.pack_start(menu_bar, false, true, 0);
 
-		vbox.pack_start(this.drawing_area, true, true, 0);
+        this.drawing_area = new DrawingArea();
+        this.drawing_area.set_size_request(400, 300);
 
-		var open_button = new Button.from_stock(STOCK_OPEN);
-		open_button.clicked.connect(on_open_clicked);
+        var black = Gdk.Color() {
+            red = 0,
+            green = 0,
+            blue = 0
+        };
 
-		var play_button = new Button.from_stock(STOCK_MEDIA_PLAY);
-		play_button.clicked.connect(on_play_clicked);
+        this.drawing_area.modify_bg(Gtk.StateType.NORMAL, black);
 
-		var stop_button = new Button.from_stock(STOCK_MEDIA_STOP);
-		stop_button.clicked.connect(on_stop_clicked);
+        vbox.pack_start(this.drawing_area, true, true, 0);
 
-		var button_box = new HButtonBox();
-		button_box.add(open_button);
-		button_box.add(play_button);
-		button_box.add(stop_button);
+        var open_button = new Button.from_stock(STOCK_OPEN);
+        open_button.clicked.connect(on_open_clicked);
 
-		vbox.pack_start(button_box, false, true, 0);
+        var play_button = new Button.from_stock(STOCK_MEDIA_PLAY);
+        play_button.clicked.connect(on_play_clicked);
 
-		add(vbox);
+        var stop_button = new Button.from_stock(STOCK_MEDIA_STOP);
+        stop_button.clicked.connect(on_stop_clicked);
 
-	}
-	
-	private void on_file_loc_activated() {
-	
-		var msg_dialog = new MessageDialog(this, DialogFlags.MODAL, 
-								Gtk.MessageType.QUESTION,
-								ButtonsType.OK_CANCEL, "");
+        var button_box = new HButtonBox();
+        button_box.add(open_button);
+        button_box.add(play_button);
+        button_box.add(stop_button);
 
-		msg_dialog.set_markup("Please enter the uri:");
+        vbox.pack_start(button_box, false, true, 0);
 
-		var entry = new Entry();
+        add(vbox);
 
-		var hbox = new HBox(false, 0);
-		hbox.pack_start(new Label("URI:"), false, true, 5);
-		hbox.pack_end(entry, true, true, 0);
+    }
 
-		msg_dialog.vbox.pack_end(hbox, true, true, 0);
-		msg_dialog.show_all();
+    private void on_file_loc_activated() {
 
-		msg_dialog.run();
+        var msg_dialog = new MessageDialog(this, DialogFlags.MODAL,
+                                           Gtk.MessageType.QUESTION,
+                                           ButtonsType.OK_CANCEL, "");
 
-		this.stream = entry.get_text();
-		this.on_stop_clicked();
-		this.stream_player.open(this.stream);
-		this.on_play_clicked();
+        msg_dialog.set_markup("Please enter the uri:");
 
-		msg_dialog.destroy();
-	
-	}
+        var entry = new Entry();
 
-	private void on_open_clicked() {
+        var hbox = new HBox(false, 0);
+        hbox.pack_start(new Label("URI:"), false, true, 5);
+        hbox.pack_end(entry, true, true, 0);
 
-		var file_chooser = new FileChooserDialog("Open File", this,
-									FileChooserAction.OPEN,
-									STOCK_CANCEL, ResponseType.CANCEL,
-									STOCK_OPEN, ResponseType.ACCEPT, null);
+        msg_dialog.vbox.pack_end(hbox, true, true, 0);
+        msg_dialog.show_all();
 
-		if (file_chooser.run() == ResponseType.ACCEPT) {
-			this.stream = file_chooser.get_uri();
-			this.on_stop_clicked();
-			this.stream_player.open(this.stream);
-			this.on_play_clicked();
-		}
+        msg_dialog.run();
+
+        this.stream = entry.get_text();
+        this.on_stop_clicked();
+        this.stream_player.open(this.stream);
+        this.on_play_clicked();
+
+        msg_dialog.destroy();
+
+    }
+
+    private void on_open_clicked() {
+
+        var file_chooser = new FileChooserDialog("Open File", this,
+                                                 FileChooserAction.OPEN,
+                                                 STOCK_CANCEL, ResponseType.CANCEL,
+                                                 STOCK_OPEN, ResponseType.ACCEPT, null);
+
+        if (file_chooser.run() == ResponseType.ACCEPT) {
+            this.stream = file_chooser.get_uri();
+            this.on_stop_clicked();
+            this.stream_player.open(this.stream);
+            this.on_play_clicked();
+        }
 
         file_chooser.destroy();
 
-	}
+    }
 
-	private void on_play_clicked() {
+    private void on_play_clicked() {
 
-		var xoverlay = this.stream_player.get_player_sink();
-		xoverlay.set_xwindow_id(Gdk.x11_drawable_get_xid(this.drawing_area.window));
-		
-		Gst.State state;
-		Gst.State pending;
-		Gst.ClockTime timeout = 1000;
+        var xoverlay = this.stream_player.get_player_sink();
+        xoverlay.set_xwindow_id(Gdk.x11_drawable_get_xid(this.drawing_area.window));
 
-		this.stream_player.player.get_state(out state, out pending, timeout);
+        Gst.State state;
+        Gst.State pending;
+        Gst.ClockTime timeout = 1000;
 
-		if (state == State.READY ||
-			state == State.PAUSED) {
+        this.stream_player.player.get_state(out state, out pending, timeout);
 
-			this.stream_player.play();
-			
-		} else if (state == State.PLAYING) {
+        if (state == State.READY ||
+            state == State.PAUSED) {
 
-			this.stream_player.pause();
-			
-		} else if (state == State.NULL) {
+            this.stream_player.play();
 
-			stdout.printf("Need to load a stream of sorts!\n");
+        } else if (state == State.PLAYING) {
 
-		}
+            this.stream_player.pause();
 
-	}
+        } else if (state == State.NULL) {
 
-	private void on_stop_clicked() {
+            stdout.printf("Need to load a stream of sorts!\n");
 
-		this.stream_player.stop();
-		
-	}
-	
-	public static int main (string[] args) {
+        }
 
-		Gtk.init(ref args);
-    	Gst.init(ref args);
+    }
 
-    	var media_player = new MediaPlayer();
-    	media_player.show_all();
+    private void on_stop_clicked() {
 
-		Gtk.main();
+        this.stream_player.stop();
 
-    	return 0;
+    }
 
-	}
+    public static int main (string[] args) {
+
+        Gtk.init(ref args);
+        Gst.init(ref args);
+
+        var media_player = new MediaPlayer();
+        media_player.show_all();
+
+        Gtk.main();
+
+        return 0;
+
+    }
 
 }
 
 public class StreamPlayer {
 
-	public dynamic Element player;
-	private Element sink;
-	private Element visualization;
+    public dynamic Element player;
+    private Element sink;
+    private Element visualization;
 
-	public StreamPlayer() {
+    public StreamPlayer() {
 
-		this.sink = ElementFactory.make("xvimagesink", "sink");
-		this.visualization = ElementFactory.make("goom2k1", "visualization");
-		this.player = ElementFactory.make("playbin", "player");
-		this.player.video_sink = this.sink;
-		this.player.vis_plugin = this.visualization;
+        this.sink = ElementFactory.make("xvimagesink", "sink");
+        this.visualization = ElementFactory.make("goom2k1", "visualization");
+        this.player = ElementFactory.make("playbin", "player");
+        this.player.video_sink = this.sink;
+        this.player.vis_plugin = this.visualization;
 
-		Gst.Bus bus = this.player.get_bus();
-		bus.add_watch(bus_callback);
+        Gst.Bus bus = this.player.get_bus();
+        bus.add_watch(bus_callback);
 
-		this.player.set_state(State.NULL);
-		
-	}
+        this.player.set_state(State.NULL);
 
-	public void open(string stream) {
+    }
 
-		this.player.uri = stream;
+    public void open(string stream) {
 
-		this.player.set_state(State.READY);
+        this.player.uri = stream;
 
-	}
+        this.player.set_state(State.READY);
 
-	public XOverlay get_player_sink() {
+    }
 
-		return this.player.video_sink;
+    public XOverlay get_player_sink() {
 
-	}
+        return this.player.video_sink;
 
-	public void play() {
+    }
 
-		this.player.set_state(State.PLAYING);
+    public void play() {
 
-	}
+        this.player.set_state(State.PLAYING);
 
-	public void pause() {
+    }
 
-		this.player.set_state(State.PAUSED);
+    public void pause() {
 
-	}
+        this.player.set_state(State.PAUSED);
 
-	public void stop() {
+    }
 
-		this.player.set_state(State.READY);
+    public void stop() {
 
-	}
+        this.player.set_state(State.READY);
+
+    }
 
     private void foreach_tag(Gst.TagList list, string tag) {
         switch (tag) {
@@ -246,50 +246,50 @@ public class StreamPlayer {
             break;
         }
     }
-	
+
     private bool bus_callback(Gst.Bus bus, Gst.Message message) {
 
         switch (message.type) {
 
-        	case Gst.MessageType.ERROR:
+            case Gst.MessageType.ERROR:
 
-            	GLib.Error err;
-	            string debug;
-	            message.parse_error (out err, out debug);
-	            stdout.printf ("Error: %s\n", err.message);
+                GLib.Error err;
+                string debug;
+                message.parse_error (out err, out debug);
+                stdout.printf ("Error: %s\n", err.message);
 
-	            break;
+                break;
 
-	        case Gst.MessageType.EOS:
+            case Gst.MessageType.EOS:
 
-	            stdout.printf ("end of stream\n");
-    	
-		        break;
+                stdout.printf ("end of stream\n");
 
-       		case Gst.MessageType.STATE_CHANGED:
+                break;
 
-            	Gst.State oldstate;
-	            Gst.State newstate;
-	            Gst.State pending;
-	            message.parse_state_changed (out oldstate, out newstate,
-    	                                     out pending);
-	            //stdout.printf ("state changed: %s->%s:%s\n",
-        	      //             oldstate.to_string (), newstate.to_string (),
-            	    //           pending.to_string ());
+               case Gst.MessageType.STATE_CHANGED:
 
-	            break;
+                Gst.State oldstate;
+                Gst.State newstate;
+                Gst.State pending;
+                message.parse_state_changed (out oldstate, out newstate,
+                                             out pending);
+                //stdout.printf ("state changed: %s->%s:%s\n",
+                //               oldstate.to_string (), newstate.to_string (),
+                //               pending.to_string ());
 
-	        case Gst.MessageType.TAG:
-    	
-		        Gst.TagList tag_list;
-        	    stdout.printf ("taglist found\n");
-            	message.parse_tag (out tag_list);
-            	tag_list.foreach ((TagForeachFunc) foreach_tag);
+                break;
 
-	            break;
+            case Gst.MessageType.TAG:
 
-	        default:
-    	        break;
+                Gst.TagList tag_list;
+                stdout.printf ("taglist found\n");
+                message.parse_tag (out tag_list);
+                tag_list.foreach ((TagForeachFunc) foreach_tag);
+
+                break;
+
+            default:
+                break;
 
         }
 
