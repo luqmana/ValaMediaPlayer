@@ -68,13 +68,13 @@ public class MediaPlayer : Window {
 
         vbox.pack_start(this.drawing_area, true, true, 0);
 
-        var open_button = new Button.from_stock(STOCK_OPEN);
+        var open_button = new Button.from_stock(Stock.OPEN);
         open_button.clicked.connect(on_open_clicked);
 
-        var play_button = new Button.from_stock(STOCK_MEDIA_PLAY);
+        var play_button = new Button.from_stock(Stock.MEDIA_PLAY);
         play_button.clicked.connect(on_play_clicked);
 
-        var stop_button = new Button.from_stock(STOCK_MEDIA_STOP);
+        var stop_button = new Button.from_stock(Stock.MEDIA_STOP);
         stop_button.clicked.connect(on_stop_clicked);
 
         var button_box = new HButtonBox();
@@ -120,8 +120,8 @@ public class MediaPlayer : Window {
 
         var file_chooser = new FileChooserDialog("Open File", this,
                                                  FileChooserAction.OPEN,
-                                                 STOCK_CANCEL, ResponseType.CANCEL,
-                                                 STOCK_OPEN, ResponseType.ACCEPT, null);
+                                                 Stock.CANCEL, ResponseType.CANCEL,
+                                                 Stock.OPEN, ResponseType.ACCEPT, null);
 
         if (file_chooser.run() == ResponseType.ACCEPT) {
             this.stream = file_chooser.get_uri();
