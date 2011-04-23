@@ -3,11 +3,10 @@ A simple Media player written in Vala. It uses GTK+ to draw widgets and whatnot 
 To compile:
 
 $make
-or
-$valac --pkg gstreamer-interfaces-0.10 --pkg gtk+-2.0 --pkg gdk-x11-2.0 ValaMediaPlayer.vala
 
 Deps:
-	- GTK+-2.0 libs (-dev packages in ubuntu)
+	- GTK+-3.0 libs (-dev packages in ubuntu)
 	- GStreamer 0.10 (-dev packages in ubuntu)
+	- GLib-2 libs
 	- vala
 	- and all their dependencies
