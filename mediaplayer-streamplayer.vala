@@ -5,9 +5,18 @@ public class StreamPlayer
     public dynamic Element player;
     private Element sink;
     private Element visualization;
+    
+    public dynamic Discoverer discoverer;
+    
+    private static uint64 gst_timeout;
+    
+    public uint width { get; private set; default = 300; }
+    public uint height { get; private set; default = 300; }
 
     public StreamPlayer()
     {
+        gst_timeout = 10;
+        
         sink = ElementFactory.make("xvimagesink", "sink");
         visualization = ElementFactory.make("goom2k1", "visualization");
         player = ElementFactory.make("playbin", "player");
@@ -18,12 +27,84 @@ public class StreamPlayer
         bus.add_watch(bus_callback);
 
         player.set_state(State.NULL);
+
+        try
+        {
+            discoverer = new Discoverer((ClockTime)( gst_timeout * Gst.SECOND ));
+        }
+        catch (Error e)
+        {
+			error ("Unable to init Gst.Discoverer: " + e.message);
+        }
+    }
+    
+    public string validate_uri (string filename)
+    {
+        if ( Gst.uri_is_valid ("file://" + filename) && 
+             GLib.FileUtils.test(filename, GLib.FileTest.IS_REGULAR) )
+        {
+            return "file://" + filename;
+        }
+        else if (Gst.uri_is_valid (filename) )
+        {
+            return filename;
+        }
+
+        warning ("%s is not a valid uri", filename);
+        return "";
+    }
+    
+    public bool load_file_info(string filename)
+    {
+        var uri = validate_uri(filename);
+        
+        if ( uri == "")
+        {
+            return false;
+        }
+        
+        DiscovererInfo info;
+        try
+        {
+            info = discoverer.discover_uri(uri);
+        }
+        catch (Error e)
+        {
+			error ("Unable discover_uri: " + e.message);
+        }
+
+        foreach (Gst.DiscovererStreamInfo i in info.get_stream_list())
+        {
+            if (i is DiscovererVideoInfo)
+            {
+                var v = (DiscovererVideoInfo) i;
+                debug ("%s has Video", filename);
+                debug ("width %u", v.get_width());
+                debug ("height %u", v.get_height());
+                height = v.get_height();
+                width = v.get_width();
+            }
+            else if (i is DiscovererAudioInfo)
+            {
+                var a = (DiscovererAudioInfo) i;
+                debug ("%s has Audio", filename);
+            }
+        }
+        return true;
     }
 
-    public void open(string stream) 
+    public bool open(string filename)
     {
-        player.uri = stream;
+        var uri = validate_uri(filename);
+        
+        if ( uri == "")
+        {
+            return false;
+        }
+        
+        player.uri = uri;
         player.set_state(State.READY);
+        return true;
     }
 
     public XOverlay get_player_sink() 

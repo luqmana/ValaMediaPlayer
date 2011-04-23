@@ -14,6 +14,7 @@ public class MediaPlayer
 
 	public Gtk.Builder builder;
 	public Gtk.Window window;
+	public Gtk.MenuBar menubar;
 
     private XOverlay player_sink;
     private StreamPlayer stream_player;
@@ -39,6 +40,8 @@ public class MediaPlayer
 		window = builder.get_object ("window1") as Gtk.Window;
 		window.destroy.connect (Gtk.main_quit);
 		window.set_title("Vala Media Player");
+
+        menubar = builder.get_object("menubar1") as Gtk.MenuBar;
 		
         var menu_quit = builder.get_object("menu_quit") as Gtk.ImageMenuItem;
         menu_quit.activate.connect (Gtk.main_quit);
@@ -54,6 +57,7 @@ public class MediaPlayer
     
     public bool key_press(Gdk.EventKey e) 
     {
+        //FIXME: Move this stuff to mediaplayer-controls.vala
         debug ("keypress : %s", Gdk.keyval_name(e.keyval));
         switch (Gdk.keyval_name(e.keyval)) 
         {
@@ -83,21 +87,28 @@ public class MediaPlayer
         debug ("open_file (%s)", filename);
 
         stream_player.stop();
-    
-        stream_player.open("file://" + filename);
-        window.set_title( GLib.Path.get_basename(filename) );
 
-        this.player_sink = this.stream_player.get_player_sink();
-        var viewport = builder.get_object("viewport1") as Gtk.Viewport;
-        this.player_sink.set_xwindow_id(gdk_x11_window_get_xid( viewport.get_bin_window() ));
-        
-//        var player = stream_player.get_player();
-        
-        stream_player.play();
+        if (stream_player.load_file_info(filename))
+        {
+            window.set_title( GLib.Path.get_basename(filename) );
+            window.resize((int) stream_player.width, (int) stream_player.height);
+            
+            //FIXME: Figure out why Gst wont resize its video if i resize the gtk window.
+
+            var viewport = builder.get_object("viewport1") as Gtk.Viewport;
+            menubar.hide();
+            
+            stream_player.open(filename);
+            player_sink = stream_player.get_player_sink();
+            player_sink.set_xwindow_id(gdk_x11_window_get_xid( viewport.get_bin_window() ));
+            
+            stream_player.play();
+        }
     }
 
     private void on_open_location () 
     {
+        //FIXME: 
 /*
         var msg_dialog = new MessageDialog(window, DialogFlags.MODAL,
                                            Gtk.MessageType.QUESTION,
@@ -140,42 +151,7 @@ public class MediaPlayer
         file_chooser.destroy();
     }
 
-    private void on_play_clicked() 
-    {
-/*
-        var xoverlay = this.stream_player.get_player_sink();
-        xoverlay.set_xwindow_id(gdk_x11_window_get_xid( viewport.get_bin_window() ));
 
-
-        Gst.State state;
-        Gst.State pending;
-        Gst.ClockTime timeout = 1000;
-        
-        window.set_title(this.stream);
-
-        this.stream_player.player.get_state(out state, out pending, timeout);
-
-        if (state == State.READY || state == State.PAUSED) 
-        {
-            this.stream_player.play();
-        } 
-        else if (state == State.PLAYING) 
-        {
-            this.stream_player.pause();
-        } 
-        else if (state == State.NULL) 
-        {
-            debug ("Need to load a stream of sorts!");
-        }
-*/
-    }
-
-/*
-    private void on_stop_clicked() 
-    {
-        window.stream_player.stop();
-    }
-*/    
 	public void run (string[] args) 
 	{
 		window.show_all ();
@@ -197,8 +173,7 @@ public class MediaPlayer
         } 
         catch (OptionError e) 
         {
-            stderr.printf("Option parsing failed: %s\n", e.message);
-            return -1;
+            error ("Option parsing failed: %s\n", e.message);
         }        
 
         Gtk.init(ref args);
