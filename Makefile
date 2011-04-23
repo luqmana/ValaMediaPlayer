@@ -1,9 +1,8 @@
-ValaMediaPlayer: ValaMediaPlayer.vala
-	valac --pkg gstreamer-interfaces-0.10 --pkg gtk+-2.0 --pkg gdk-x11-2.0 ValaMediaPlayer.vala
+EXEC=valamediaplayer
+PACKAGES=--pkg gtk+-3.0 --pkg gstreamer-interfaces-0.10 --pkg gdk-x11-3.0 --pkg glib-2.0
+SOURCES=mediaplayer-main.vala mediaplayer-streamplayer.vala mediaplayer-controls.vala
+FLAGS=-DDEBUG
 
-all: ValaMediaPlayer
+all:
+	valac $(PACKAGES) -X $(FLAGS) $(SOURCES) -o $(EXEC)
 
-clean:
-	rm ValaMediaPlayer
-	
-.PHONY: clean
